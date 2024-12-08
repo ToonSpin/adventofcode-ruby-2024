@@ -9,21 +9,30 @@ class Equation
     @operands = operands.split.map {|s| s.to_i}
   end
 
-  def possible?(operators = [])
-    if operators.length == @operands.length - 1
-      aggregate = @operands[0]
-      (1...@operands.length).each do |i|
-        case operators[i - 1]
-        in :add
-          aggregate += @operands[i]
-        in :mul
-          aggregate *= @operands[i]
-        end
-      end
-      return aggregate == @test_value
+  def possible?(part_two = false, aggregate = @test_value, operands = @operands.clone)
+    operand = operands.pop
+
+    if operands.length == 0
+      return operand == aggregate
     end
 
-    return self.possible?(operators + [:add]) || self.possible?(operators + [:mul])
+    if part_two
+      digits = Math.log10(operand).to_i + 1
+      p10 = 10 ** digits
+      if aggregate % p10 == operand
+        return true if self.possible?(part_two, aggregate / p10, operands.clone)
+      end
+    end
+
+    if aggregate % operand == 0
+      return true if self.possible?(part_two, aggregate / operand, operands.clone)
+    end
+
+    if aggregate >= operand
+      return true if self.possible?(part_two, aggregate - operand, operands.clone)
+    end
+
+    return false
   end
 end
 
@@ -36,3 +45,4 @@ file.each do |line|
 end
 
 puts equations.filter {|e| e.possible?}.map {|e| e.test_value}.sum
+puts equations.filter {|e| e.possible?(true)}.map {|e| e.test_value}.sum
