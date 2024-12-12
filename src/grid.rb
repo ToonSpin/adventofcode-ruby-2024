@@ -7,6 +7,14 @@ class Grid
     @height = @lines.length
   end
 
+  def each_cell
+    (0...@height).each do |y|
+      (0...@width).each do |x|
+        yield x, y
+      end
+    end
+  end
+
   def scan(regex_or_string)
     result = []
     if regex_or_string.is_a? String
@@ -26,10 +34,11 @@ class Grid
     return result if not block_given?
   end
 
-  def neighbors(x, y, diag=true)
+  def neighbors(x, y, diag=false)
     result = []
     for q in (y-1..y+1)
       for p in (x-1..x+1)
+        next if p == x && q == y
         next if p < 0
         next if q < 0
         next if p >= @width
