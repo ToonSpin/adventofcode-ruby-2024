@@ -78,13 +78,25 @@ file = File.open(file_path, "r")
 
 robots = file.map {|line| Robot.new line}
 area = Area.new(robots, 101, 103)
-area.iterate(100)
-puts area.safety()
 
-(100..).each do |i|
+indices_found = []
+i = 0
+step = 1
+while true
+  i += step
+  area.iterate(step)
+  if indices_found.length < 2 && area.safety() < 100000000
+    indices_found << i
+    if indices_found.length == 2
+      j, k = indices_found
+      step = k - j
+    end
+  end
   if area.safety() < 50000000
     puts i
     break
   end
-  area.iterate(1)
+  if i == 100
+    puts area.safety()
+  end
 end
