@@ -1,0 +1,12 @@
+AllCops:
+  NewCops: enable
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 30
+
+# I don't know what this is well enough yet
+Metrics/AbcSize:
+  Enabled: false
