@@ -58,6 +58,10 @@ class Grid
     @lines[y][x]
   end
 
+  def set_cell(x, y, c)
+    @lines[y][x] = c
+  end
+
   def to_s()
     @lines.join "\n"
   end
