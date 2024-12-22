@@ -1,46 +1,33 @@
-def update_matches?(update, rule)
-  first, second = rule
-  update.each_with_index do |page, i|
-    next if page != first
-    update.each_with_index do |other, j|
-      next if other != second
-      return false if j < i
-    end
-  end
-  return true
+# frozen_string_literal: true
+
+def update_matches?(update, first, second)
+  first_index = update.index(first)
+  second_index = update.index(second)
+  first_index.nil? || second_index.nil? || first_index < second_index
 end
 
 def update_matches_all?(update, rules)
-  rules.all? {|rule| update_matches? update, rule}
+  rules.all? { |first, second| update_matches?(update, first, second) }
 end
 
-def compare_update(a, b, rules)
-  rules.each do |rule|
-    first, second = rule
+def compare_pages(a, b, rules)
+  rules.each do |first, second|
     return -1 if first == a && second == b
     return 1 if first == b && second == a
   end
-  return 0
+  0
 end
 
 def sort_update!(update, rules)
-  result = update
-  result.sort! { |a, b| compare_update(a, b, rules) }
+  update.sort! { |a, b| compare_pages(a, b, rules) }
 end
 
 file_path = ARGV[0]
-file = File.open(file_path, "r")
+file = File.open(file_path, 'r')
 input = file.read
 
-rules = []
-input.scan(/(\d+)\|(\d+)/).each do |a, b|
-  rules << [a.to_i, b.to_i]
-end
-
-updates = []
-input.scan(/^(\d+(,\d+)*)$/).each do |update, _|
-  updates.push update.split(',').map {|s| s.to_i}
-end
+rules = input.scan(/(\d+)\|(\d+)/).map { |a| a.map(&:to_i) }
+updates = input.scan(/^(\d+(,\d+)*)$/).map { |update,| update.split(',').map(&:to_i) }
 
 sum_correct = 0
 sum_incorrect = 0
