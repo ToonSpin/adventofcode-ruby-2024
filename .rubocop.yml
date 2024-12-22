@@ -4,9 +4,15 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Style/YodaCondition:
+  Enabled: false # hell no
+
 Metrics/MethodLength:
   Max: 30
 
 # I don't know what this is well enough yet
 Metrics/AbcSize:
   Enabled: false
+
+Naming/MethodParameterName:
+  MinNameLength: 1
