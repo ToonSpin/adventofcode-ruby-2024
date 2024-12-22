@@ -24,13 +24,14 @@ end
 
 file_path = ARGV[0]
 file = File.open(file_path, 'r')
-input = file.read
 
-rules = input.scan(/(\d+)\|(\d+)/).map { |a| a.map(&:to_i) }
-updates = input.scan(/^(\d+(,\d+)*)$/).map { |update,| update.split(',').map(&:to_i) }
+rules, updates = file.read.split("\n\n")
+rules = rules.split.map { |s| s.split('|').map(&:to_i) }
+updates = updates.split.map { |s| s.split(',').map(&:to_i) }
 
 sum_correct = 0
 sum_incorrect = 0
+
 updates.each do |update|
   index = update.length / 2
   if update_matches_all?(update, rules)
@@ -40,5 +41,6 @@ updates.each do |update|
     sum_incorrect += update[index]
   end
 end
+
 puts sum_correct
 puts sum_incorrect
