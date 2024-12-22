@@ -1,45 +1,38 @@
+# frozen_string_literal: true
+
 file_path = ARGV[0]
-file = File.open(file_path, "r")
+file = File.open(file_path, 'r')
 
-$stone_counts = {}
+memo = {}
 
-def get_stone_count_single(stone)
-  return 1 if stone == 0
+def stone_count_single(stone)
+  return 1 if stone.zero?
+
   num_digits = Math.log10(stone).floor + 1
-  return 2 if num_digits % 2 == 0
-  return 1
+  return 2 if (num_digits % 2).zero?
+
+  1
 end
 
-def get_stone_count(stone, iterations)
-  key = [stone, iterations]
+def stone_count_compute(stone, iter, memo)
+  return stone_count_single(stone) if iter == 1
+  return stone_count(1, iter - 1, memo) if stone.zero?
 
-  if !$stone_counts.include?(key)
-    if iterations == 1
-      $stone_counts[key] = get_stone_count_single(stone)
-      return $stone_counts[key]
-    end
+  num_digits = Math.log10(stone).floor + 1
+  return stone_count(stone * 2024, iter - 1, memo) unless (num_digits % 2).zero?
 
-    if stone == 0
-      $stone_counts[key] = get_stone_count(1, iterations - 1)
-    else
-      num_digits = Math.log10(stone).floor + 1
-      if num_digits % 2 == 0
-        factor = 10 ** (num_digits / 2)
-        $stone_counts[key] = get_stone_count((stone / factor).floor, iterations - 1)
-        $stone_counts[key] += get_stone_count(stone % factor, iterations - 1)
-      else
-        $stone_counts[key] = get_stone_count(stone * 2024, iterations - 1)
-      end
-    end
-  end
-
-  return $stone_counts[key]
+  factor = 10**(num_digits / 2)
+  left, right = stone.divmod factor
+  stone_count(left, iter - 1, memo) + stone_count(right, iter - 1, memo)
 end
 
-input = file.read.strip.split.map {|s| s.to_i}
+def stone_count(stone, iter, memo)
+  key = [stone, iter]
+  memo[key] = stone_count_compute(stone, iter, memo) unless memo.include?(key)
+  memo[key]
+end
 
-count = input.map { |stone| get_stone_count(stone, 25) }
-puts count.sum
+input = file.read.split.map(&:to_i)
 
-count = input.map { |stone| get_stone_count(stone, 75) }
-puts count.sum
+puts input.map { |stone| stone_count(stone, 25, memo) }.sum
+puts input.map { |stone| stone_count(stone, 75, memo) }.sum
